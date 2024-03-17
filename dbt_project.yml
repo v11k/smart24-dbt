@@ -36,3 +36,6 @@ models:
     ga4:
       +materialized: table
       +tags: "ga4"
+    sheets:
+      +materialized: table
+      +tags: "sheets"
