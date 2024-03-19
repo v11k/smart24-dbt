@@ -39,3 +39,6 @@ models:
     google_drive:
       +materialized: table
       +tags: "google_drive"
+    mailchimp:
+      +materialized: table
+      +tags: "mailchimp"
