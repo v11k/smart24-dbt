@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: ga4_properties
+    database: airbyte
+    schema: ga4
+    tables:
+      - name: s24_properties

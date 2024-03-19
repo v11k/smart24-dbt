@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: google_drive_clients
+    database: airbyte
+    schema: google_drive
+    tables:
+      - name: accounts
+      - name: contacts

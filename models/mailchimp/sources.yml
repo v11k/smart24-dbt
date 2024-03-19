@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: mailchimp_cegmenedzser
+    database: airbyte
+    schema: mailchimp_cegmenedzser
+    tables:
+      - name: automations
+      - name: campaigns
+      - name: lists
+      - name: reports
+      - name: unsubscribes

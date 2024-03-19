@@ -36,6 +36,8 @@ models:
     ga4:
       +materialized: table
       +tags: "ga4"
-    sheets:
+      +schema: "ga4"
+    google_drive:
       +materialized: table
-      +tags: "sheets"
+      +tags: "google_drive"
+      +schema: "google_drive"
