@@ -7,6 +7,5 @@ sources:
       - name: automations
       - name: campaigns
       - name: lists
-      - name: email_activity
       - name: reports
       - name: unsubscribes
