@@ -6,3 +6,13 @@ sources:
     schema: ga4
     tables:
       - name: s24_properties
+  - name: ga4_sajat
+    database: airbyte
+    schema: ga4
+    tables:
+      - name: s24_conversions
+      - name: s24_demographics
+      - name: s24_events
+      - name: s24_pages
+      - name: s24_traffic
+      - name: s24_users
