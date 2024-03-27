@@ -8,15 +8,15 @@
 
     {% set union_queries = [] %}
     {% for property_id in property_ids %}
-        {% set users_table_name = 's24_pages_users' ~ property_id %}
+        {% set users_table_name = 's24_users_property' ~ property_id %}
         {% set properties_table = ref('properties_with_attribute') %}
         {% set query = "
         SELECT
             to_date(u.date, 'YYYYMMDD') as \"Date\",
-            p.account_display_name as \"Account name\",
-            p.account_id as \"Account ID\",
-            p.property_display_name as \"GA4 property\",
-            p.property_id as \"GA4 property ID\",
+            pr.account_display_name as \"Account name\",
+            pr.account_id as \"Account ID\",
+            pr.property_display_name as \"GA4 property\",
+            pr.property_id as \"GA4 property ID\",
             u.\"firstUserSourceMedium\" as \"First user source / medium\",
             u.\"firstUserDefaultChannelGroup\" as \"First user default channel grouping\",
             u.\"firstUserCampaignName\" as \"User campaign name\",
@@ -28,8 +28,8 @@
             u.\"screenPageViews\" as \"Views\",
             u.\"userEngagementDuration\" as \"Total user engagement (sec)\",
             u.\"engagedSessions\" as \"Engaged sessions\"
-        FROM ga4." ~ users_table_name ~ " pa
-        LEFT JOIN " ~ properties_table ~ " pr ON pr.property_id::text = pa.property_id::text
+        FROM ga4." ~ users_table_name ~ " u
+        LEFT JOIN " ~ properties_table ~ " pr ON pr.property_id::text = u.property_id::text
         "
         %}
         {% do union_queries.append(query) %}

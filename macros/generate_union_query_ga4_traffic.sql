@@ -14,10 +14,10 @@
         "SELECT \
         
         TO_DATE(tr.date, 'YYYYMMDD') as \"Date\", \
-        p.account_display_name as \"Account name\", \
-        p.account_id as \"Account ID\", \
-        p.property_display_name as \"GA4 property\", \
-        p.property_id as \"GA4 property ID\", \
+        pr.account_display_name as \"Account name\", \
+        pr.account_id as \"Account ID\", \
+        pr.property_display_name as \"GA4 property\", \
+        pr.property_id as \"GA4 property ID\", \
         tr.\"sessionSourceMedium\" as \"Session source / medium\", \
         tr.\"sessionDefaultChannelGroup\" as \"Session default channel grouping\", \
         tr.\"sessionCampaignName\" as \"Session campaign name\", \
@@ -30,8 +30,7 @@
         tr.\"screenPageViews\" as \"Views\", \
         tr.\"userEngagementDuration\" as \"Total user engagement duration (sec)\" \
         FROM ga4." ~ traffic_table_name ~ " tr \
-        LEFT JOIN " ~ properties_table ~ " p ON p.property_id::text = tr.property_id::text \
-        ORDER BY \"Date\" DESC"
+        LEFT JOIN " ~ properties_table ~ " pr ON pr.property_id::text = tr.property_id::text"
         %}
         {% do union_queries.append(query) %}
         {% do log('Generated query for property ID ' ~ property_id, info=True) %}

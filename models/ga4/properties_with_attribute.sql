@@ -15,3 +15,5 @@ SELECT
     accounts.attribute
 from properties
 left join accounts on accounts.account::text = properties.account_id::text
+where properties.property_id not in
+('283326009') /*FAMASZ nem használt property*/

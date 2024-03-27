@@ -8,15 +8,15 @@
 
     {% set union_queries = [] %}
     {% for property_id in property_ids %}
-        {% set demographics_table_name = 's24_pages_demographics' ~ property_id %}
+        {% set demographics_table_name = 's24_demographics_property' ~ property_id %}
         {% set properties_table = ref('properties_with_attribute') %}
         {% set query = "
         SELECT
             to_date(d.date, 'YYYYMMDD') as \"Date\",
-            p.account_display_name as \"Account name\",
-            p.account_id as \"Account ID\",
-            p.property_display_name as \"GA4 property\",
-            p.property_id as \"GA4 property ID\",
+            pr.account_display_name as \"Account name\",
+            pr.account_id as \"Account ID\",
+            pr.property_display_name as \"GA4 property\",
+            pr.property_id as \"GA4 property ID\",
             d.\"deviceCategory\" as \"Device category\",
             d.language as \"Language\",
             d.country as \"Country\",
@@ -28,8 +28,8 @@
             d.\"screenPageViews\" as \"Views\",
             d.\"userEngagementDuration\" as \"Total user engagement (sec)\",
             d.\"engagedSessions\" as \"Engaged sessions\"
-        FROM ga4." ~ demographics_table_name ~ " pa
-        LEFT JOIN " ~ properties_table ~ " pr ON pr.property_id::text = pa.property_id::text
+        FROM ga4." ~ demographics_table_name ~ " d
+        LEFT JOIN " ~ properties_table ~ " pr ON pr.property_id::text = d.property_id::text
         "
         %}
         {% do union_queries.append(query) %}
