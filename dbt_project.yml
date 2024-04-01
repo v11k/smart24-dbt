@@ -41,3 +41,6 @@ models:
     mailchimp:
       +materialized: table
       +tags: "mailchimp"
+    instagram:
+      +materialized: table
+      +tags: "instagram"
