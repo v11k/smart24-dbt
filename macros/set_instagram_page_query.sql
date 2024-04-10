@@ -16,6 +16,6 @@ left join instagram.user_insights ui
 left join {{ ref("instagram_page_ids_with_attribute")}} a
     on a.id = u.id
 WHERE 
-   attribute = '{{ company_name }}'
+   a.attribute = '{{ company_name }}'
 
 {% endmacro %}
