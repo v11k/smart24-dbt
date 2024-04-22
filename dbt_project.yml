@@ -44,3 +44,6 @@ models:
     instagram:
       +materialized: table
       +tags: "instagram"
+    google_ads:
+      +materialized: table
+      +tags: "gads"
