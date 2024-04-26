@@ -28,6 +28,6 @@ from cleaned_campaigns c
 left join {{ ref("gads_accounts_with_attribute")}} acc
 	on acc.customer_id::text = c."Account ID"::text
 
-where acc.attribute in '{{ company_name }}'
+where acc.attribute = '{{ company_name }}'
 
 {% endmacro %}
