@@ -3,7 +3,7 @@ WITH gads_accounts as (
 ),
 accounts as (
     select id, name, account, platform, attribute, account_level_2 
-    from google_drive.accounts
+    from {{ source('google_drive_clients', 'client_accounts') }} 
     where platform = 'gads'
 )
 

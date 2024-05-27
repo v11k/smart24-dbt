@@ -5,5 +5,5 @@ sources:
     database: airbyte
     schema: google_drive
     tables:
-      - name: accounts
-      - name: contacts
+      - name: client_accounts
+      - name: client_contacts

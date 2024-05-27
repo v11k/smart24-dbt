@@ -23,7 +23,7 @@
             c.\"campaignName\" as \"Event campaign name\",
             c.\"manualTerm\" as \"Manual term\",
             c.\"manualAdContent\" as \"Manual ad content\",
-            c.conversions as \"Conversions\",
+            c.\"keyEvents\" as \"Conversions\",
             c.\"eventValue\" as \"Event value\",
             c.\"totalUsers\" as \"Total users\"
         FROM ga4." ~ conversions_table_name ~ " c

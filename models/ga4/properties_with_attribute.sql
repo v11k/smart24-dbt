@@ -3,7 +3,7 @@ WITH properties as (
 ),
 accounts as (
     select id, name, account, platform, attribute, account_level_2 
-    from {{ source('google_drive_clients', 'accounts') }} 
+    from {{ source('google_drive_clients', 'client_accounts') }} 
     where platform = 'ga4'
 )
 
