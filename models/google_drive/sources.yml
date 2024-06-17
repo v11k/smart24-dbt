@@ -7,3 +7,10 @@ sources:
     tables:
       - name: client_accounts
       - name: client_contacts
+  - name: google_drive_fbi
+    database: airbyte
+    schema: google_drive
+    tables:
+      - name: fbi_postsview
+      - name: fbi_likesview
+      - name: fbi_page
