@@ -1,6 +1,7 @@
 {% macro get_fbi_posts_query(company_name) %}
 
- SELECT DISTINCT "FBI_posts".post_creation_date AS "Post creation date",
+ SELECT DISTINCT 
+    cast("FBI_posts".post_creation_date as date) AS "Post creation date",
     "FBI_posts".page_name AS "Page name",
     "FBI_posts".page_app_id::text AS "Page ID",
     "FBI_posts".post_id AS "Post ID",
