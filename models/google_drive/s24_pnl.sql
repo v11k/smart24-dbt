@@ -3,7 +3,7 @@ select
 	cast(replace(honap,'.','-') as date) as date,
 	ugyfel as source_name,
 	cast(osszeg as numeric) as amount
-from "google_drive"."Bevetelek"
+from "google_drive"."s24finance_Bevetelek"
 
 UNION
 	
@@ -12,7 +12,7 @@ select
 	cast(replace(replace(kelte,'.','-'),' ','') as date) as date,
 	partner as source_name,
 	cast(brutto as numeric) as amount
-from "google_drive"."Facebook"
+from "google_drive"."s24finance_Facebook"
 
 UNION
 	
@@ -21,7 +21,7 @@ select
 	cast(replace(replace(kelte,'.','-'),' ','') as date) as date,
 	partner as source_name,
 	cast(brutto as numeric) as amount
-from "google_drive"."Google"
+from "google_drive"."s24finance_Google"
 
 UNION
 	
@@ -30,7 +30,7 @@ select
 	cast(replace(replace(kelte,'.','-'),' ','') as date) as date,
 	partner as source_name,
 	cast(brutto as numeric) as amount
-from "google_drive"."Rackforest"
+from "google_drive"."s24finance_Rackforest"
 
 UNION
 	
@@ -39,7 +39,7 @@ select
 	cast(replace(replace(kelte,'.','-'),' ','') as date) as date,
 	partner as source_name,
 	cast(brutto as numeric) as amount
-from "google_drive"."Litvan_server"
+from "google_drive"."s24finance_Litvan_server"
 
 UNION
 	
@@ -48,7 +48,7 @@ select
 	cast(replace(replace(kelte,'.','-'),' ','') as date) as date,
 	partner as source_name,
 	cast(brutto as numeric) as amount
-from "google_drive"."Supermetrics"
+from "google_drive"."s24finance_Supermetrics"
 
 UNION
 	
@@ -57,7 +57,7 @@ select
 	cast(replace(replace(kelte,'.','-'),' ','') as date) as date,
 	partner as source_name,
 	cast(brutto as numeric) as amount
-from "google_drive"."Fivetran"
+from "google_drive"."s24finance_Fivetran"
 
 UNION
 	
@@ -66,7 +66,7 @@ select
 	cast(replace(replace(honap,'.','-'),' ','') as date) as date,
 	megnevezes as source_name,
 	cast(osszeg as numeric) as amount
-from "google_drive"."SSL"
+from "google_drive"."s24finance_SSL"
 
 UNION
 	
@@ -75,4 +75,4 @@ select
 	cast(replace(replace(honap,'.','-'),' ','') as date) as date,
 	megnevezes as source_name,
 	cast(osszeg as numeric) as amount
-from "google_drive"."Egyeb"
+from "google_drive"."s24finance_Egyeb"
