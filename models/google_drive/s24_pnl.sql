@@ -58,3 +58,21 @@ select
 	partner as source_name,
 	cast(brutto as numeric) as amount
 from "google_drive"."Fivetran"
+
+UNION
+	
+select 
+	'SSL' as source_type,
+	cast(replace(replace(honap,'.','-'),' ','') as date) as date,
+	megnevezes as source_name,
+	cast(osszeg as numeric) as amount
+from "google_drive"."SSL"
+
+UNION
+	
+select 
+	'Egyéb' as source_type,
+	cast(replace(replace(honap,'.','-'),' ','') as date) as date,
+	megnevezes as source_name,
+	cast(osszeg as numeric) as amount
+from "google_drive"."Egyeb"
