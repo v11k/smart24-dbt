@@ -10,6 +10,5 @@ sources:
       - name: stories
       - name: story_insights
       - name: user_insights
-      - name: user_insights
       - name: user_lifetime_insights
       - name: users
