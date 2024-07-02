@@ -47,9 +47,3 @@ models:
     google_ads:
       +materialized: table
       +tags: "gads"
-  - name: ga4_traffic_cegmenedzser
-    columns:
-      - name: "Date"
-        meta:
-          dimension:
-            type: date
