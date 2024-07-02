@@ -1,0 +1,15 @@
+version: 2
+
+sources:
+  - name: instagram
+    database: airbyte
+    schema: instagram
+    tables:
+      - name: media
+      - name: media_insights
+      - name: stories
+      - name: story_insights
+      - name: user_insights
+      - name: user_insights
+      - name: user_lifetime_insights
+      - name: users

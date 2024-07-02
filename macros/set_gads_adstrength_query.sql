@@ -24,8 +24,9 @@ select
 from cleaned_ads ad
 left join {{ ref("gads_accounts_with_attribute")}} acc
 	on acc.customer_id::text = ad."Account ID"::text
-left join (select distinct ad_group_id, ad_group_name, campaign_id from google_ads.ad_group) gr
+left join (select distinct ad_group_id, ad_group_name, campaign_id, segments_date from google_ads.ad_group) gr
 	on gr.ad_group_id = ad."Ad group ID"
+	and gr.segments_date = ad."Date"
 where acc.attribute = '{{ company_name }}'
     and "Ad strength" is not NULL
     and "Ad strength" <> 'UNSPECIFIED'
