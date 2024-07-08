@@ -1,0 +1,15 @@
+version: 2
+
+sources:
+  - name: google_ads
+    database: airbyte
+    schema: google_ads
+    tables:
+      - name: ad_group
+      - name: ad_group_ad
+      - name: ad_group_criterion
+      - name: ad_group_ad_legacy
+      - name: campaign
+      - name: customer
+      - name: keyword_view
+

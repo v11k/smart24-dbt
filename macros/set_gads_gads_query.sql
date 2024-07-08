@@ -17,7 +17,7 @@ with cleaned_ads as (
 		sum(metrics_interactions) as "Interactions",
 		sum(metrics_conversions) as "Conversions",
 		sum(metrics_conversions_value) as "Total conversion value"
-	FROM google_ads.ad_group_ad_legacy
+	FROM {{ source('google_ads', 'ad_group_ad_legacy') }}
 	group by 1,2,3,4,5,6,7,8,9
 )
 select 

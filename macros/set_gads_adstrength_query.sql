@@ -12,7 +12,7 @@ with cleaned_ads as (
 		ad_group_ad_policy_summary_approval_status as "Ad approval status",
 		ad_group_ad_ad_final_urls as "Final URL",
 		sum(metrics_impressions) as "Impressions"
-    FROM google_ads.ad_group_ad_legacy
+    FROM {{ source('google_ads', 'ad_group_ad_legacy') }}
 	group by 1,2,3,4,5,6,7,8,9
 )
 select 

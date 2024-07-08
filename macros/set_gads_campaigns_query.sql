@@ -17,7 +17,7 @@ with cleaned_campaigns as (
 		sum(metrics_clicks) as "Clicks",
 		sum(metrics_interactions) as "Interactions",
 		sum(metrics_conversions_value) as "Total conversion value"
-	FROM google_ads.campaign
+	FROM {{ source('google_ads', 'campaign') }}
 	group by 1,2,3,4,5,6,7,8,9
 )
 select 
