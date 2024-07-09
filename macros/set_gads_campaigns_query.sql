@@ -7,7 +7,7 @@ with cleaned_campaigns as (
 		campaign_id "Campaign ID",
 		campaign_status as "Campaign status",
 		(regexp_matches(campaign_base_campaign, 'customers/(\d+)/'))[1] as "Account ID",
-		campaign_advertising_channel_type as "Advertising channel type",
+		replace(concat(upper("left"(campaign_advertising_channel_type::text, 1)), lower(SUBSTRING(campaign_advertising_channel_type FROM 2))), '_'::text, ' '::text) as "Advertising channel type",
 		campaign_start_date as "Start date",
 		campaign_end_date as "End date",
 		case when campaign_optimization_score = 0 then NULL else campaign_optimization_score end as "Optimization score",
