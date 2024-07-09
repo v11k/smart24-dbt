@@ -3,7 +3,7 @@ version: 2
 sources:
   - name: instagram
     database: airbyte
-    schema: instagram
+    schema: instagram_custom
     tables:
       - name: media
       - name: media_insights

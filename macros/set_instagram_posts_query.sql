@@ -20,8 +20,8 @@ SELECT
 	coalesce(i.reach,0) as "Media reach",
 	coalesce(i.saved,0) as "Unique saves",
 	m.id as "Post ID"
-FROM instagram.media m
-LEFT JOIN instagram.media_insights i
+FROM {{ source('instagram', 'media') }} m
+LEFT JOIN {{ source('instagram', 'media_insights') }} i
 	on i.id = m.id
 left join {{ ref("instagram_page_ids_with_attribute")}} a
 	on a.id = m.business_account_id
