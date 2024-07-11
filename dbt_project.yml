@@ -47,3 +47,6 @@ models:
     google_ads:
       +materialized: table
       +tags: "gads"
+    facebook_pages:
+      +materialized: table
+      +tags: "fbpages"
