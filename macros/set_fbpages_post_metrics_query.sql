@@ -44,6 +44,6 @@ FROM
 LEFT JOIN
     expanded_reactions ON insights_with_post_id.post_id = expanded_reactions.post_id
 GROUP BY 
-    insights_with_post_id.post_id;
+    insights_with_post_id.post_id
 
 {% endmacro %}
