@@ -25,8 +25,8 @@ select
 	m.post_reactions_love as "Post reactions: love",
 	m.post_reactions_sorry as "Post reactions: sad",
 	m.post_reactions_like + m.post_reactions_wow + m.post_reactions_haha + m.post_reactions_anger + m.post_reactions_love + m.post_reactions_sorry as "Total post reactions"
-from {{ ref('facebook_pages_custom.' ~ company_name ~ '_post') }} po
-left join {{ ref('facebook_pages_custom.' ~ company_name ~ '_page') }} pa
+from facebook_pages_custom.{{ company_name }}_post po
+left join facebook_pages_custom.{{ company_name }}_page pa
 	on split_part(po.id, '_', 1) = pa.id
 left join {{ ref("fbpages_post_metrics_" ~ company_name)}} m
 	on m.post_id = po.id

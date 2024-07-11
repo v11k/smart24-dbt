@@ -6,7 +6,7 @@ WITH reaction_values AS (
         name,
         (values -> 0 -> 'value') AS json_object
     FROM 
-        {{ ref('facebook_pages_custom.' ~ company_name ~ '_post_insights') }}
+        facebook_pages_custom.{{ company_name }}_post_insights
     WHERE 
         name = 'post_reactions_by_type_total'
 ),
@@ -25,7 +25,7 @@ insights_with_post_id AS (
         name,
         values
     FROM 
-        {{ ref('facebook_pages_custom.' ~ company_name ~ '_post_insights') }}
+        facebook_pages_custom.{{ company_name }}_post_insights
 )
 SELECT 
     insights_with_post_id.post_id,
