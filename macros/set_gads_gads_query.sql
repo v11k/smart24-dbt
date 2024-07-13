@@ -26,7 +26,8 @@ select
 	acc.customer_descriptive_name as "Account",
 	gr.campaign_id as "Campaign ID",
 	c.campaign_name as "Campaign name",
-	c.campaign_advertising_channel_type as "Advertising channel type"
+	c.campaign_advertising_channel_type as "Advertising channel type",
+	gr.ad_group_name as "Ad group name"
 
 from cleaned_ads ad
 left join {{ ref("gads_accounts_with_attribute")}} acc
