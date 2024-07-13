@@ -10,7 +10,7 @@ with cleaned_ads as (
 		ad_group_ad_status as "Ad status",
 		ad_group_ad_ad_strength as "Ad strength",
 		ad_group_ad_policy_summary_approval_status as "Ad approval status",
-		ad_group_ad_ad_final_urls as "Final URL",
+		ad_group_ad_ad_final_urls -> 0 as "Final URL",
 		sum(metrics_impressions) as "Impressions",
 		sum(metrics_clicks) as "Clicks",
 		sum(metrics_cost_micros/1000000) as "Cost",
@@ -41,7 +41,7 @@ left join (
 		replace(concat(upper("left"(campaign_advertising_channel_type::text, 1)), lower(SUBSTRING(campaign_advertising_channel_type FROM 2))), '_'::text, ' '::text) as campaign_advertising_channel_type
 		from google_ads.campaign
 ) c
-	on c.campaign_id = ad."Ad ID"
+	on c.campaign_id = gr.campaign_id
 where acc.attribute = '{{ company_name }}'
 
 
