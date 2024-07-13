@@ -6,7 +6,7 @@ with cleaned_ads as (
 		(regexp_matches(ad_group_ad_ad_group, 'customers/(\d+)/'))[1] as "Account ID",
 		ad_group_id as "Ad group ID",
 		ad_group_ad_ad_id as "Ad ID",
-		replace(concat(upper("left"(ad_group_ad_ad_type::text, 1)), lower(SUBSTRING(ad_group_ad_ad_type_type FROM 2))), '_'::text, ' '::text) as "Ad type",
+		replace(concat(upper("left"(ad_group_ad_ad_type::text, 1)), lower(SUBSTRING(ad_group_ad_ad_type FROM 2))), '_'::text, ' '::text) as "Ad type",
 		ad_group_ad_status as "Ad status",
 		ad_group_ad_ad_strength as "Ad strength",
 		ad_group_ad_policy_summary_approval_status as "Ad approval status",
