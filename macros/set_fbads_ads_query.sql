@@ -17,6 +17,7 @@ WITH extracted_actions AS (
 creative_ids as(
 	select 
 		distinct id as ad_id, 
+		status,
 		replace((creative -> 'id')::text, '"','') as creative_id 
 	from {{ source('facebook_ads', 'ads') }}
 )
@@ -36,6 +37,7 @@ select
 	concat('https://www.facebook.com/adsmanager/manage/ads?act=', ai.account_id, '&selected_campaign_ids=', ai.campaign_id, '&selected_adset_ids=', ai.adset_id) as "Ad set edit link",
 	coalesce(cre.image_url, cre.thumbnail_url) as "Ad creative image URL",
 	c.configured_status as "Campaign configured status",
+	creid.status as "Ad status",
 	cre.name as "Creative name",
 	cre.title as "Creative title",
 	cre.body as "Ad body",	
