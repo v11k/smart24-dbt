@@ -3,6 +3,14 @@ version: 2
 sources:
   - name: facebook_ads
     database: airbyte
-    schema: fivetran
+    schema: facebook_ads
     tables:
-      - name: fbads
+      - name: ad_creatives
+      - name: ad_sets
+      - name: ads
+      - name: ads_insights
+      - name: campaigns
+      - name: custom_audiences
+      - name: custom_conversions
+      - name: images
+      - name: videos
