@@ -50,3 +50,6 @@ models:
     facebook_pages:
       +materialized: table
       +tags: "fbpages"
+    facebook_ads:
+      +materialized: table
+      +tags: "fbads"
