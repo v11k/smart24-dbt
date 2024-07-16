@@ -24,7 +24,7 @@ select
 	m.post_reactions_anger as "Post reactions: angry",
 	m.post_reactions_love as "Post reactions: love",
 	m.post_reactions_sorry as "Post reactions: sad",
-	m.post_reactions_like + m.post_reactions_wow + m.post_reactions_haha + m.post_reactions_anger + m.post_reactions_love + m.post_reactions_sorry as "Total post reactions",
+	coalesce(m.post_reactions_like + m.post_reactions_wow + m.post_reactions_haha + m.post_reactions_anger + m.post_reactions_love + m.post_reactions_sorry,0) as "Total post reactions",
 	case when b.fbpages_id is null then 'Nem boost' else 'Boost' end as boost
 from facebook_pages_custom.{{ company_name }}_post po
 left join facebook_pages_custom.{{ company_name }}_page pa
