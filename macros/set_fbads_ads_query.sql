@@ -79,7 +79,7 @@ left join {{ source('facebook_ads', 'ad_creatives') }} cre
 	on cre.id = creid.creative_id
 left join {{ ref("fbads_accounts_with_attribute")}} acc
 	on acc.account_id::text = ai.account_id::text
-where acc.attribute = '{{ company_name }}'
+where acc.attribute like '{{ company_name }}'
     and ai.impressions is not null
 	and ai.impressions > 0
 order by ai.date_start 

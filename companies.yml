@@ -1,0 +1,47 @@
+companies:
+  - name: cegmenedzser
+    platforms:
+      - facebook_ads
+      - facebook_pages
+      - ga4
+      - google_ads
+      - instagram
+      - mailchimp
+  - name: coolklima
+    platforms:
+      - facebook_pages
+      - ga4
+      - google_ads
+      - instagram
+  - name: divas
+    platforms:
+      - facebook_ads
+      - facebook_pages
+      - ga4
+      - google_ads
+      - instagram
+  - name: gepeszcentrum
+    platforms:
+      - facebook_ads
+      - facebook_pages
+      - ga4
+      - google_ads
+  - name: sillmaster
+    platforms:
+      - facebook_ads
+      - facebook_pages
+      - ga4
+      - google_ads
+      - instagram
+  - name: wagnersolar
+    platforms:
+      - facebook_ads
+      - facebook_pages
+      - ga4
+      - google_ads
+      - instagram
+  - name: yellowbird
+    platforms:
+      - facebook_ads
+      - ga4
+      - instagram
