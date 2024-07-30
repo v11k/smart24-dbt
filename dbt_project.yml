@@ -53,3 +53,6 @@ models:
     facebook_ads:
       +materialized: table
       +tags: "fbads"
+    executive:
+      +materialized: table
+      +tags: "exec"
