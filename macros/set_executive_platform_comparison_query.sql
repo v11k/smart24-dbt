@@ -150,7 +150,7 @@ SELECT
     cd1.platform,
     cd1.cost,
     cd1.impressions,
-    cd1.clicks,
+    coalesce(cd1.clicks,0) as clicks,
     cd1.conversions,
     cd1.ga4_conversions,
 	cd1.ga4_conversion_value,
