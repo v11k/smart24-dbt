@@ -6,6 +6,7 @@
                         'insta_posts_' ~ get_company_name(),
                         'ga4_traffic_' ~ get_company_name(),
                         'ga4_conversions_' ~ get_company_name(),
+                        'mailchimp_campaigns_' ~ get_company_name()
                         ]}
 ) }}
 {% set company_name = get_company_name() %}
