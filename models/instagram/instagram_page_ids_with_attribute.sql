@@ -1,5 +1,5 @@
 WITH pages as (
-    select * from "airbyte"."instagram"."users" 
+    select * from {{ source('instagram', 'users') }} 
 ),
 accounts as (
     select id, name, account, platform, attribute, account_level_2 
