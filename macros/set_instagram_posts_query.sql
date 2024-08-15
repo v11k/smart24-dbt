@@ -10,7 +10,7 @@ SELECT
             WHEN m.media_product_type::text = 'REELS'::text THEN 'REEL'::character varying
             ELSE m.media_type
         END AS "Media type",
-	m.media_url as "Media URL",
+	case when m.media_product_type = 'REELS' then m.thumbnail_url else m.media_url end as "Media URL",
 	m.permalink as "Media permalink",
 	m.caption as "Media caption",
 	coalesce(m.comments_count + m.like_count + i.saved,0) as "Engagement",
