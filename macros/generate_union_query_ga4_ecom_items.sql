@@ -18,7 +18,7 @@
             pr.property_display_name as \"GA4 property\",
             pr.property_id as \"GA4 property ID\",
             e.\"itemId\" as \"Item ID\",
-            e.\"itenName\" as \"Item name\",
+            e.\"itemName\" as \"Item name\",
             e.\"itemBrand\" as \"Item brand\",
             e.\"itemRevenue\" as \"Item revenue\",
             e.\"itemsViewed\" as \"Items viewed\",
