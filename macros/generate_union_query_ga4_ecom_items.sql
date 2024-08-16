@@ -29,7 +29,7 @@
             e.\"itemCategory5\" as \"Item category 5\",
             e.\"itemsPurchased\" as \"Items purchased\",
             e.\"itemsCheckedOut\" as \"Items checked out\",
-            e.\"itemsAddedtoCart\" as \"Items added to cart\"
+            e.\"itemsAddedToCart\" as \"Items added to cart\"
         FROM ga4." ~ ecom_items_table_name ~ " e
         LEFT JOIN " ~ properties_table ~ " pr ON pr.property_id::text = e.property_id::text
         "
