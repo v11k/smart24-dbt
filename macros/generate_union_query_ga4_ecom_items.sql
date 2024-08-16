@@ -8,7 +8,7 @@
 
     {% set union_queries = [] %}
     {% for property_id in property_ids %}
-        {% set ecom_items_table_name = 's24_ecom_items' ~ property_id %}
+        {% set ecom_items_table_name = 's24_ecom_items_property' ~ property_id %}
         {% set properties_table = ref('properties_with_attribute') %}
         {% set query = "
         SELECT
