@@ -1,5 +1,4 @@
+{% set schema_name = get_mailchimp_schema() %}
 
--- This model is automatically generated to ensure it exists
-select *
-from {{ ref('mailchimp_lists_cegmenedzser') }}
-limit 0
+
+{{ get_mailchimp_lists_query(schema_name) }}
