@@ -15,35 +15,47 @@ expanded_reactions AS (
         post_id,
         (jsonb_each_text(json_object)).key AS reaction_type,
         (jsonb_each_text(json_object)).value::int AS reaction_count
-    FROM 
-        reaction_values
+    FROM reaction_values
+),
+aggregated_reactions as(
+	select 
+		post_id,
+		sum(case when reaction_type = 'like' then expanded_reactions.reaction_count else 0 end) as post_reactions_like,
+    	sum(case when reaction_type = 'love' then expanded_reactions.reaction_count else 0 end) as post_reactions_love,
+    	sum(case when reaction_type = 'haha' then expanded_reactions.reaction_count else 0 end) as post_reactions_haha,
+    	sum(case when reaction_type = 'wow' then expanded_reactions.reaction_count else 0 end) as post_reactions_wow,
+    	sum(case when reaction_type = 'anger' then expanded_reactions.reaction_count else 0 end) as post_reactions_anger,
+    	sum(case when reaction_type = 'sorry' then expanded_reactions.reaction_count else 0 end) as post_reactions_sorry,
+		sum(coalesce(reaction_count,0)) as post_reactions_total
+	from expanded_reactions
+	group by post_id
 ),
 insights_with_post_id AS (
     SELECT 
         substring(id FROM 1 FOR position('/' IN id) - 1) as post_id,
-        id,
-        name,
-        values
+		sum(case when name = 'post_impressions_unique' then (values -> 0 ->> 'value')::numeric else 0 end) as post_reach,
+    	sum(case when name = 'post_impressions' then (values -> 0 ->> 'value')::numeric else 0 end) as post_impressions,
+		sum(case when name = 'post_engaged_users' then (values -> 0 ->> 'value')::numeric else 0 end) as post_engaged_users
     FROM 
         facebook_pages_custom.{{ company_name }}_post_insights
+	GROUP BY 1
 )
 SELECT 
-    insights_with_post_id.post_id,
-    sum(case when insights_with_post_id.name = 'post_impressions_unique' then (insights_with_post_id.values -> 0 ->> 'value')::numeric else 0 end) as post_reach,
-    sum(case when insights_with_post_id.name = 'post_impressions' then (insights_with_post_id.values -> 0 ->> 'value')::numeric else 0 end) as post_impressions,
-	sum(case when insights_with_post_id.name = 'post_engaged_users' then (insights_with_post_id.values -> 0 ->> 'value')::numeric else 0 end) as post_engaged_users,
-    sum(case when expanded_reactions.reaction_type = 'like' then expanded_reactions.reaction_count else 0 end) as post_reactions_like,
-    sum(case when expanded_reactions.reaction_type = 'love' then expanded_reactions.reaction_count else 0 end) as post_reactions_love,
-    sum(case when expanded_reactions.reaction_type = 'haha' then expanded_reactions.reaction_count else 0 end) as post_reactions_haha,
-    sum(case when expanded_reactions.reaction_type = 'wow' then expanded_reactions.reaction_count else 0 end) as post_reactions_wow,
-    sum(case when expanded_reactions.reaction_type = 'anger' then expanded_reactions.reaction_count else 0 end) as post_reactions_anger,
-    sum(case when expanded_reactions.reaction_type = 'sorry' then expanded_reactions.reaction_count else 0 end) as post_reactions_sorry,
-	sum(coalesce(expanded_reactions.reaction_count,0)) as post_reactions_total
+    i.post_id,
+    i.post_reach,
+    i.post_impressions,
+	i.post_engaged_users,
+    ar.post_reactions_like,
+    ar.post_reactions_love,
+    ar.post_reactions_haha,
+    ar.post_reactions_wow,
+    ar.post_reactions_anger,
+    ar.post_reactions_sorry,
+	ar.post_reactions_total
 FROM 
-    insights_with_post_id
+    insights_with_post_id i
 LEFT JOIN
-    expanded_reactions ON insights_with_post_id.post_id = expanded_reactions.post_id
-GROUP BY 
-    insights_with_post_id.post_id
+    aggregated_reactions ar ON i.post_id = ar.post_id
+
 
 {% endmacro %}
