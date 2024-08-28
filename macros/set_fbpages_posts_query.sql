@@ -33,5 +33,5 @@ left join {{ ref("fbpages_post_metrics_" ~ company_name)}} m
 	on m.post_id = po.id
 left join {{ ref("fbads_boosted_posts")}} b
 	on b.fbpages_id = po.id
-
+where po.is_eligible_for_promotion <> 'false'
 {% endmacro %}
