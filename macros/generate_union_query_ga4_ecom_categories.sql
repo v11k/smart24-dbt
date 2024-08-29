@@ -1,4 +1,4 @@
-{% macro generate_ga4_union_ecom_items(company_name) %}
+{% macro generate_ga4_union_ecom_categories(company_name) %}
 {% set property_ids = get_property_ids_for_company(company_name) %}
     {% do log('Property IDs for ' ~ company_name ~ ': ' ~ (property_ids | join(', ')), info=True) %}
 
@@ -17,22 +17,18 @@
             pr.account_id as \"Account ID\",
             pr.property_display_name as \"GA4 property\",
             pr.property_id as \"GA4 property ID\",
-            e.\"itemId\" as \"Item ID\",
-            e.\"itemName\" as \"Item name\",
-            e.\"itemBrand\" as \"Item brand\",
-            e.\"itemRevenue\" as \"Item revenue\",
-            e.\"itemsViewed\" as \"Items viewed\",
             e.\"itemCategory\" as \"Item category\",
             e.\"itemCategory2\" as \"Item category 2\",
-            e.\"itemCategory3\" as \"Item category 3\",
-            e.\"itemCategory4\" as \"Item category 4\",
-            e.\"itemCategory5\" as \"Item category 5\",
-            e.\"itemsPurchased\" as \"Items purchased\",
-            e.\"itemsCheckedOut\" as \"Items checked out\",
-            e.\"itemsAddedToCart\" as \"Items added to cart\"
+            e.\"itemBrand\" as \"Item brand\",
+            sum(e.\"itemsViewed\") as \"Items viewed\",
+            sum(e.\"itemsPurchased\") as \"Items purchased\",
+            sum(e.\"itemsCheckedOut\") as \"Items checked out\",
+            sum(e.\"itemsAddedToCart\") as \"Items added to cart\",
+            sum(e.\"itemRevenue\") as \"Item revenue\"
         FROM ga4." ~ ecom_items_table_name ~ " e
         LEFT JOIN " ~ properties_table ~ " pr ON pr.property_id::text = e.property_id::text
         WHERE (e.\"itemsViewed\" + e.\"itemsAddedToCart\" + e.\"itemsCheckedOut\" + e.\"itemsPurchased\" + e.\"itemRevenue\") <> 0
+        GROUP BY 1,2,3,4,5,6,7,8
         "
         %}
         {% do union_queries.append(query) %}
