@@ -56,3 +56,6 @@ models:
     executive:
       +materialized: table
       +tags: "exec"
+    google_search_console:
+      +materialized:: table
+      +tags: "gsc"

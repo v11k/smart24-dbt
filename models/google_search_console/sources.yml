@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: google_search_console
+    database: airbyte
+    schema: gsc
+    tables:
+      - name: search_analytics_by_page
+      - name: search_analytics_by_query
+      - name: search_analytics_by_date
+ 
