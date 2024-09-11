@@ -8,7 +8,7 @@ SELECT
     s.position,
     s.impressions,
     s.clicks
-from {{ source('gsc', 'search_analytics_by_query') }} s
+from {{ source('google_search_console', 'search_analytics_by_query') }} s
 left join {{ ref("gsc_sites_with_attribute")}} a
     on a.site_url = s.site_url
 WHERE 
