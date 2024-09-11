@@ -57,5 +57,5 @@ models:
       +materialized: table
       +tags: "exec"
     google_search_console:
-      +materialized:: table
+      +materialized: table
       +tags: "gsc"
