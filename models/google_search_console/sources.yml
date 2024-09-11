@@ -5,6 +5,7 @@ sources:
     database: airbyte
     schema: gsc
     tables:
+      - name: sites
       - name: search_analytics_by_page
       - name: search_analytics_by_query
       - name: search_analytics_by_date
