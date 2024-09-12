@@ -4,7 +4,10 @@ SELECT
     s.site_url,
     s.date,
     s.search_type,
-    REGEXP_REPLACE(s.page, '^(https?://[^/]+/?)', '') AS page,
+    CASE 
+        WHEN s.page ~* '^https?://[^/]+/?$' THEN s.page
+        ELSE REGEXP_REPLACE(s.page, '^(https?://[^/]+/?)', '')
+    END AS result,
     s.position AS current_position,
     s.impressions AS current_impressions,
     s.clicks AS current_clicks,
