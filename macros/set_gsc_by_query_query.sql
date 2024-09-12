@@ -20,6 +20,7 @@ LEFT JOIN
     {{ source('google_search_console', 'search_analytics_by_query') }} s_prev
     ON s.site_url = s_prev.site_url
     AND s.search_type = s_prev.search_type
+    AND s.query = s_prev.query
     AND s.date = s_prev.date + INTERVAL '30 days'
 WHERE 
     a.attribute = '{{ company_name }}'
