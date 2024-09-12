@@ -7,7 +7,7 @@ SELECT
     CASE 
         WHEN s.page ~* '^https?://[^/]+/?$' THEN s.page
         ELSE REGEXP_REPLACE(s.page, '^(https?://[^/]+/?)', '')
-    END AS result,
+    END AS page,
     s.position AS current_position,
     s.impressions AS current_impressions,
     s.clicks AS current_clicks,
