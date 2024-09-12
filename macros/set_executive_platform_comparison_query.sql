@@ -1,6 +1,5 @@
 {% macro get_executive_platform_comparison_query(company_name) %}
-WITH combined_data as 
-(
+with combined_data AS (
 --FACEBOOK ADS
 (select 
     "Date" as "date",
@@ -141,8 +140,57 @@ UNION
  	0 as ga4_conversion_value,
  	0 as ga4_sessions
 from {{ ref("mailchimp_campaigns_" ~ company_name)}}
-group by 1,2,3,4
-)
+group by 1,2,3,4)
+),
+date_range AS (
+    -- Same as before: Generate a date range for all dates
+    SELECT GENERATE_SERIES(
+        (SELECT MIN("date") FROM combined_data),
+        (SELECT MAX("date") FROM combined_data),
+        '1 day'::INTERVAL
+    ) AS date
+),
+-- Aggregate the combined_data to make sure each date-account-platform has a single row
+aggregated_combined_data AS (
+    SELECT 
+        "date", 
+        "account", 
+        "account_id", 
+        "platform", 
+        SUM(cost) AS cost, 
+        SUM(impressions) AS impressions, 
+        SUM(clicks) AS clicks, 
+        SUM(conversions) AS conversions, 
+        SUM(ga4_conversions) AS ga4_conversions, 
+        SUM(ga4_conversion_value) AS ga4_conversion_value, 
+        SUM(ga4_sessions) AS ga4_sessions
+    FROM combined_data
+    GROUP BY "date", "account", "account_id", "platform"
+),
+cross_joined_data AS (
+    -- Cross join the date range with accounts and platforms, ensuring every date has a row for every account-platform
+    SELECT 
+        dr.date,
+        ac.account,
+        ac.account_id,
+        ac.platform,
+        COALESCE(agg.cost, 0) AS cost,
+        COALESCE(agg.impressions, 0) AS impressions,
+        COALESCE(agg.clicks, 0) AS clicks,
+        COALESCE(agg.conversions, 0) AS conversions,
+        COALESCE(agg.ga4_conversions, 0) AS ga4_conversions,
+        COALESCE(agg.ga4_conversion_value, 0) AS ga4_conversion_value,
+        COALESCE(agg.ga4_sessions, 0) AS ga4_sessions
+    FROM date_range dr
+    CROSS JOIN (
+        SELECT DISTINCT account, account_id, platform 
+        FROM aggregated_combined_data
+    ) ac
+    LEFT JOIN aggregated_combined_data agg
+    ON dr.date = agg.date
+    AND ac.account = agg.account
+    AND ac.account_id = agg.account_id
+    AND ac.platform = agg.platform
 )
 SELECT
     cd1.date,
@@ -150,25 +198,25 @@ SELECT
     cd1.platform,
     cd1.cost,
     cd1.impressions,
-    coalesce(cd1.clicks,0) as clicks,
+    COALESCE(cd1.clicks, 0) AS clicks,
     cd1.conversions,
     cd1.ga4_conversions,
-	cd1.ga4_conversion_value,
-	cd1.ga4_sessions,
+    cd1.ga4_conversion_value,
+    cd1.ga4_sessions,
     -- Add columns for metrics 30 days ago from the joined table (cd2)
-    coalesce(cd2.cost,0) AS cost_30_days_ago,
-    coalesce(cd2.impressions,0) AS impressions_30_days_ago,
-    coalesce(cd2.clicks,0) AS clicks_30_days_ago,
-    coalesce(cd2.conversions,0) AS conversions_30_days_ago,
-    coalesce(cd2.ga4_conversions,0) AS ga4_conversions_30_days_ago,
-	coalesce(cd2.ga4_conversion_value,0) AS ga4_conversion_value_30_days_ago,
-	coalesce(cd2.ga4_sessions,0) as ga4_sessions_30_days_ago
-FROM combined_data cd1
-LEFT JOIN combined_data cd2
+    COALESCE(cd2.cost, 0) AS cost_30_days_ago,
+    COALESCE(cd2.impressions, 0) AS impressions_30_days_ago,
+    COALESCE(cd2.clicks, 0) AS clicks_30_days_ago,
+    COALESCE(cd2.conversions, 0) AS conversions_30_days_ago,
+    COALESCE(cd2.ga4_conversions, 0) AS ga4_conversions_30_days_ago,
+    COALESCE(cd2.ga4_conversion_value, 0) AS ga4_conversion_value_30_days_ago,
+    COALESCE(cd2.ga4_sessions, 0) AS ga4_sessions_30_days_ago
+FROM cross_joined_data cd1
+LEFT JOIN cross_joined_data cd2
     ON cd1.account = cd2.account
-	AND cd1.account_id = cd2.account_id
+    AND cd1.account_id = cd2.account_id
     AND cd1.platform = cd2.platform
     AND cd2.date = cd1.date - INTERVAL '30 DAYS'
-ORDER BY cd1.date desc, cd1.account, cd1.platform
+ORDER BY cd1.date DESC, cd1.account, cd1.platform;
 
 {% endmacro %}
