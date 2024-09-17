@@ -1,95 +1,7 @@
 {% macro get_executive_platform_comparison_query(company_name) %}
-with combined_data AS (
---FACEBOOK ADS
-(select 
-    "Date" as "date",
-    "Account" as "account",
-    "Account ID"::text as "account_id",
-    'Facebook Ads' as "platform",
-    sum("Cost") as "cost",
-    sum("Impressions") as "impressions",
-    sum("Link clicks") as "clicks",
-    sum("Website conversions") as "conversions",
-    0 as ga4_conversions,
-    0 as ga4_conversion_value,
-    0 as ga4_sessions
-from {{ ref("fbads_ads_" ~ company_name)}}
-group by 1,2,3,4
-)
-		
-UNION
---GOOGLE ADS
-(select 
-    "Date" as "date",
-    "Account" as "account",
-	"Account ID"::text as "account_id",
-	'Google Ads' as "platform",
-	sum("Cost") as "cost",
- 	sum("Impressions") as "impressions",
- 	sum("Clicks") as "clicks",
-	sum("Conversions") as "conversions",
- 	0 as "ga4_conversions",
- 	0 as ga4_conversion_value,
- 	0 as ga4_sessions
-from {{ ref("gads_ads_" ~ company_name)}}
-group by 1,2,3,4
-)	
-		
-UNION
---FACEBOOK INSIGHTS
-(SELECT 
-	"Post creation date" as "date",
-    "Page name" as "account",
- 	"Page ID"::text as "account_id",
-	'Organikus Facebook' as "platform",
-	0 as "cost",
-	sum("Post impressions") as "impressions",
-	NULL as "clicks",
-	0 as "conversions",
- 	0 as "ga4_conversions",
- 	0 as ga4_conversion_value,
- 	0 as ga4_sessions
-FROM {{ ref("fbpages_posts_" ~ company_name)}}
-group by 1,2,3,4
- )
-		
-UNION
---INSTAGRAM INSIGHTS
-(select 
-    "Date" as "date",
-	"Name" as "account",
- 	"User ID"::text as "account_id",
-	'Organikus Instagram' as "platform",
-	0 as "cost",
- 	sum("Media impressions") as "impressions",
- 	0 as "clicks",
-	0 as "conversions",
- 	0 as "ga4_conversions",
- 	0 as ga4_conversion_value,
- 	0 as ga4_sessions
-from {{ ref("insta_posts_" ~ company_name)}}
-group by 1,2,3,4
-)
-
-UNION 
- --GOOGLE ANALYTICS 4
-SELECT
-	ga4t.date,
-	ga4t.account,
-	ga4t.account_id,
-	ga4t.platform,
-	0 as "cost",
- 	0 as "impressions",
- 	0 as "clicks",
- 	0 as "conversions",
-	coalesce(ga4c.ga4_conversions,0) as ga4_conversions,
-	coalesce(ga4c.ga4_conversion_value,0) as ga4_conversion_value,
-	coalesce(ga4t.ga4_sessions,0) as ga4_sessions
-FROM	
-	(select
+with ga4_sessions as (
+select
 		"Date" as "date",
-		"Account name" as "account",
-	 	"Account ID" as "account_id",
 		case when "Session source / medium" like '%facebook%cpc%' then 'Facebook Ads'
 			when "Session source / medium" like '%google%cpc%' then 'Google Ads'
 			when "Session source / medium" like '%instagram%referral%' then 'Organikus Instagram'
@@ -101,13 +13,11 @@ FROM
 		    end as "platform",
 		sum("Sessions") as ga4_sessions
  	from {{ ref("ga4_traffic_" ~ company_name)}}
-	group by 1,2,3,4
-	)  ga4t
-left join 
-	 (select
+	group by 1,2
+),
+ga4_conversions as (
+select
 	    "Date" as "date",
-		"Account name" as "account",
-	  	"Account ID" as "account_id",
 		case when "Source / medium" like '%facebook%cpc%' then 'Facebook Ads'
             when "Source / medium" like '%google%cpc%' then 'Google Ads'
             when "Source / medium" like '%instagram%referral%' then 'Organikus Instagram'
@@ -120,28 +30,212 @@ left join
 		SUM("Conversions") as ga4_conversions,
 		SUM("Event value") as ga4_conversion_value
 	 from {{ ref("ga4_conversions_" ~ company_name)}}
-	 group by 1,2,3,4
-	) ga4c
-on ga4c.date = ga4t.date and ga4c.account= ga4t.account and ga4t.platform = ga4c.platform
+	 group by 1,2
+),
+combined_data AS (
+--FACEBOOK ADS
+(select 
+    fbads."Date" as "date",
+    'Facebook Ads' as "platform",
+    sum(fbads."Cost") as "cost",
+    sum(fbads."Impressions") as "impressions",
+    sum(fbads."Link clicks") as "clicks",
+    sum(fbads."Website conversions") as "conversions",
+    sum(ga4c.ga4_conversions) as ga4_conversions,
+    sum(ga4c.ga4_conversion_value) as ga4_conversion_value,
+    sum(ga4t.ga4_sessions) as ga4_sessions
+from {{ ref("fbads_ads_" ~ company_name)}} fbads
+left join (
+    select 
+        date, 
+        ga4_sessions
+    from ga4_traffic
+    where platform = 'Facebook Ads'
+) ga4t
+    on ga4t.date = fbads."Date"
+left join (
+    select 
+        date, 
+        ga4_conversions,
+        ga4_conversion_value
+    from ga4_conversions
+    where platform = 'Facebook Ads'
+    group by 1
+) ga4c
+    on ga4c.date = fbads."Date"
+group by 1,2
+)
+		
+UNION
+--GOOGLE ADS
+(select 
+    gads."Date" as "date",
+	'Google Ads' as "platform",
+	sum(gads."Cost") as "cost",
+ 	sum(gads."Impressions") as "impressions",
+ 	sum(gads."Clicks") as "clicks",
+	sum(gads."Conversions") as "conversions",
+ 	ga4c.ga4_conversions as ga4_conversions,
+ 	ga4c.ga4_conversion_value as ga4_conversion_value,
+ 	ga4t.ga4_sessions as ga4_sessions
+from {{ ref("gads_ads_" ~ company_name)}} gads
+left join (
+    select 
+        date, 
+        ga4_sessions
+    from ga4_traffic
+    where platform = 'Google Ads'
+) ga4t
+    on ga4t.date = gads."Date"
+left join (
+    select 
+        date, 
+        ga4_conversions,
+        ga4_conversion_value
+    from ga4_conversions
+    where platform = 'Google Ads'
+    group by 1
+) ga4c
+    on ga4c.date = gads."Date"
+group by 1,2
+)
+		
+UNION
+--FACEBOOK INSIGHTS
+(SELECT 
+	fbi."Post creation date" as "date",
+	'Organikus Facebook' as "platform",
+	0 as "cost",
+	sum(fbi."Post impressions") as "impressions",
+	NULL as "clicks",
+	0 as "conversions",
+ 	ga4c.ga4_conversions as ga4_conversions,
+ 	ga4c.ga4_conversion_value as ga4_conversion_value,
+ 	ga4t.ga4_sessions as ga4_sessions
+FROM {{ ref("fbpages_posts_" ~ company_name)}} fbi
+left join (
+    select 
+        date, 
+        ga4_sessions
+    from ga4_traffic
+    where platform = 'Organikus Facebook'
+) ga4t
+    on ga4t.date = fbi."Date"
+left join (
+    select 
+        date, 
+        ga4_conversions,
+        ga4_conversion_value
+    from ga4_conversions
+    where platform = 'Organikus Facebook'
+    group by 1
+) ga4c
+    on ga4c.date = fbi."Date"
+group by 1,2
+)
+		
+UNION
+--INSTAGRAM INSIGHTS
+(select 
+    i."Date" as "date",
+	'Organikus Instagram' as "platform",
+	0 as "cost",
+ 	sum(i."Media impressions") as "impressions",
+ 	0 as "clicks",
+	0 as "conversions",
+ 	ga4c.ga4_conversions as ga4_conversions,
+ 	ga4c.ga4_conversion_value as ga4_conversion_value,
+ 	ga4t.ga4_sessions as ga4_sessions
+from {{ ref("insta_posts_" ~ company_name)}} i
+left join (
+    select 
+        date, 
+        ga4_sessions
+    from ga4_traffic
+    where platform = 'Organikus Instagram'
+) ga4t
+    on ga4t.date = i."Date"
+left join (
+    select 
+        date, 
+        ga4_conversions,
+        ga4_conversion_value
+    from ga4_conversions
+    where platform = 'Organikus Instagram'
+    group by 1
+) ga4c
+    on ga4c.date = i."Date"
+group by 1,2
+)
+
+UNION 
+ --GOOGLE ANALYTICS 4 EGYÉB
+SELECT
+	ga4t.date,
+	ga4t.platform,
+	0 as "cost",
+ 	0 as "impressions",
+ 	0 as "clicks",
+ 	0 as "conversions",
+	sum(coalesce(ga4c.ga4_conversions,0)) as ga4_conversions,
+	sum(coalesce(ga4c.ga4_conversion_value,0)) as ga4_conversion_value,
+	sum(coalesce(ga4t.ga4_sessions,0)) as ga4_sessions
+FROM	
+(   select 
+        date, 
+        ga4_sessions
+    from ga4_traffic
+    where platform = 'Egyéb'
+)  ga4t
+left join (
+    select 
+        date, 
+        ga4_conversions,
+        ga4_conversion_value
+    from ga4_conversions
+    where platform = 'Egyéb'
+    group by 1
+) ga4c
+    on ga4c.date = ga4t.date
+group by 1,2
+
 
 UNION
 
 --MAILCHIMP
 (select 
-    "Date" as "date",
-	'Email marketing account' as "account",
- 	'Mailchimp ID' as "account_id",
+    mc."Date" as "date",
 	'Email Marketing' as "platform",
 	0 as "cost",
- 	sum("Unique opens") as "impressions",
- 	sum("Unique clicks") as "clicks",
+ 	sum(mc."Unique opens") as "impressions",
+ 	sum(mc."Unique clicks") as "clicks",
 	0 as "conversions",
- 	0 as "ga4_conversions",
- 	0 as ga4_conversion_value,
- 	0 as ga4_sessions
-from {{ ref("mailchimp_campaigns_" ~ company_name)}}
-group by 1,2,3,4)
-),
+ 	ga4c.ga4_conversions as ga4_conversions,
+ 	ga4c.ga4_conversion_value as ga4_conversion_value,
+ 	ga4t.ga4_sessions as ga4_sessions
+from {{ ref("mailchimp_campaigns_" ~ company_name)}} mc
+left join (
+    select 
+        date, 
+        ga4_sessions
+    from ga4_traffic
+    where platform = 'Email Marketing'
+) ga4t
+    on ga4t.date = i."Date"
+left join (
+    select 
+        date, 
+        ga4_conversions,
+        ga4_conversion_value
+    from ga4_conversions
+    where platform = 'Email Marketing'
+    group by 1
+) ga4c
+    on ga4c.date = mc."Date"
+group by 1,2)
+
+)
+,
 date_range AS (
     -- Same as before: Generate a date range for all dates
     SELECT GENERATE_SERIES(
