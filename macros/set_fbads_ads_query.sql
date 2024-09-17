@@ -14,6 +14,16 @@ WITH extracted_actions AS (
     jsonb_array_elements(actions) AS action
   group by 1,2
 ),
+extracted_action_values AS (
+  SELECT
+	ad_id,
+	date_start as date,
+    SUM((av->>'value')::int) FILTER (WHERE av->>'action_type' = 'purchase') AS purchase_value
+  FROM
+    {{ source('facebook_ads', 'ads_insights') }},
+    jsonb_array_elements(action_values) AS av
+  group by 1,2
+),
 creative_ids as(
 	select 
 		distinct id as ad_id, 
@@ -51,6 +61,7 @@ select
 	coalesce(ex.purchases,0) as "Purchases",
 	coalesce(ex.leads,0) as "Leads",
 	coalesce(ex.messages,0) as "New messaging conversations",
+	coalesce(exav.purchase_value) as "Purchase value",
 	CASE
             WHEN ai.objective::text ~~ '%CONVERSION%'::text THEN 'Konverziók'::character varying
             WHEN ai.objective::text ~~ '%ENGAGEMENT%'::text THEN 'Post interakció'::character varying
@@ -68,6 +79,9 @@ from {{ source('facebook_ads', 'ads_insights') }} ai
 left join extracted_actions ex
 	on ex.date = ai.date_start
 	and ex.ad_id = ai.ad_id
+left join extracted_action_values exav
+	on exav.date = ai.date_start
+	and exav.ad_id = ai.ad_id
 left join {{ source('facebook_ads', 'campaigns') }} c
 	on c.id = ai.campaign_id
 
