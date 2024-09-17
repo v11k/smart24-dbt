@@ -297,6 +297,6 @@ FROM cross_joined_data cd1
 LEFT JOIN cross_joined_data cd2
     ON cd1.platform = cd2.platform
     AND cd2.date = cd1.date - INTERVAL '30 DAYS'
-ORDER BY cd1.date DESC, cd1.platform;
+ORDER BY cd1.date DESC, cd1.platform
 
 {% endmacro %}
