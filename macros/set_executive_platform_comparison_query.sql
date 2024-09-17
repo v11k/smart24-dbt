@@ -60,7 +60,6 @@ left join (
         ga4_conversion_value
     from ga4_conversions
     where platform = 'Facebook Ads'
-    group by 1
 ) ga4c
     on ga4c.date = fbads."Date"
 group by 1,2
@@ -75,9 +74,9 @@ UNION
  	sum(gads."Impressions") as "impressions",
  	sum(gads."Clicks") as "clicks",
 	sum(gads."Conversions") as "conversions",
- 	ga4c.ga4_conversions as ga4_conversions,
- 	ga4c.ga4_conversion_value as ga4_conversion_value,
- 	ga4t.ga4_sessions as ga4_sessions
+ 	sum(ga4c.ga4_conversions) as ga4_conversions,
+ 	sum(ga4c.ga4_conversion_value) as ga4_conversion_value,
+ 	sum(ga4t.ga4_sessions) as ga4_sessions
 from {{ ref("gads_ads_" ~ company_name)}} gads
 left join (
     select 
@@ -94,7 +93,6 @@ left join (
         ga4_conversion_value
     from ga4_conversions
     where platform = 'Google Ads'
-    group by 1
 ) ga4c
     on ga4c.date = gads."Date"
 group by 1,2
@@ -109,9 +107,9 @@ UNION
 	sum(fbi."Post impressions") as "impressions",
 	NULL as "clicks",
 	0 as "conversions",
- 	ga4c.ga4_conversions as ga4_conversions,
- 	ga4c.ga4_conversion_value as ga4_conversion_value,
- 	ga4t.ga4_sessions as ga4_sessions
+ 	sum(ga4c.ga4_conversions) as ga4_conversions,
+ 	sum(ga4c.ga4_conversion_value) as ga4_conversion_value,
+ 	sum(ga4t.ga4_sessions) as ga4_sessions
 FROM {{ ref("fbpages_posts_" ~ company_name)}} fbi
 left join (
     select 
@@ -120,7 +118,7 @@ left join (
     from ga4_traffic
     where platform = 'Organikus Facebook'
 ) ga4t
-    on ga4t.date = fbi."Date"
+    on ga4t.date = fbi."Post creation date"
 left join (
     select 
         date, 
@@ -128,9 +126,8 @@ left join (
         ga4_conversion_value
     from ga4_conversions
     where platform = 'Organikus Facebook'
-    group by 1
 ) ga4c
-    on ga4c.date = fbi."Date"
+    on ga4c.date = fbi."Post creation date"
 group by 1,2
 )
 		
@@ -143,9 +140,9 @@ UNION
  	sum(i."Media impressions") as "impressions",
  	0 as "clicks",
 	0 as "conversions",
- 	ga4c.ga4_conversions as ga4_conversions,
- 	ga4c.ga4_conversion_value as ga4_conversion_value,
- 	ga4t.ga4_sessions as ga4_sessions
+ 	sum(ga4c.ga4_conversions) as ga4_conversions,
+ 	sum(ga4c.ga4_conversion_value) as ga4_conversion_value,
+ 	sum(ga4t.ga4_sessions) as ga4_sessions
 from {{ ref("insta_posts_" ~ company_name)}} i
 left join (
     select 
@@ -162,7 +159,6 @@ left join (
         ga4_conversion_value
     from ga4_conversions
     where platform = 'Organikus Instagram'
-    group by 1
 ) ga4c
     on ga4c.date = i."Date"
 group by 1,2
@@ -183,7 +179,8 @@ SELECT
 FROM	
 (   select 
         date, 
-        ga4_sessions
+        ga4_sessions,
+        platform
     from ga4_traffic
     where platform = 'Egyéb'
 )  ga4t
@@ -194,7 +191,6 @@ left join (
         ga4_conversion_value
     from ga4_conversions
     where platform = 'Egyéb'
-    group by 1
 ) ga4c
     on ga4c.date = ga4t.date
 group by 1,2
@@ -210,9 +206,9 @@ UNION
  	sum(mc."Unique opens") as "impressions",
  	sum(mc."Unique clicks") as "clicks",
 	0 as "conversions",
- 	ga4c.ga4_conversions as ga4_conversions,
- 	ga4c.ga4_conversion_value as ga4_conversion_value,
- 	ga4t.ga4_sessions as ga4_sessions
+ 	sum(ga4c.ga4_conversions) as ga4_conversions,
+ 	sum(ga4c.ga4_conversion_value) as ga4_conversion_value,
+ 	sum(ga4t.ga4_sessions) as ga4_sessions
 from {{ ref("mailchimp_campaigns_" ~ company_name)}} mc
 left join (
     select 
@@ -221,7 +217,7 @@ left join (
     from ga4_traffic
     where platform = 'Email Marketing'
 ) ga4t
-    on ga4t.date = i."Date"
+    on ga4t.date = mc."Date"
 left join (
     select 
         date, 
@@ -229,7 +225,6 @@ left join (
         ga4_conversion_value
     from ga4_conversions
     where platform = 'Email Marketing'
-    group by 1
 ) ga4c
     on ga4c.date = mc."Date"
 group by 1,2)
@@ -248,8 +243,6 @@ date_range AS (
 aggregated_combined_data AS (
     SELECT 
         "date", 
-        "account", 
-        "account_id", 
         "platform", 
         SUM(cost) AS cost, 
         SUM(impressions) AS impressions, 
@@ -259,14 +252,12 @@ aggregated_combined_data AS (
         SUM(ga4_conversion_value) AS ga4_conversion_value, 
         SUM(ga4_sessions) AS ga4_sessions
     FROM combined_data
-    GROUP BY "date", "account", "account_id", "platform"
+    GROUP BY "date", "platform"
 ),
 cross_joined_data AS (
     -- Cross join the date range with accounts and platforms, ensuring every date has a row for every account-platform
     SELECT 
-        dr.date,
-        ac.account,
-        ac.account_id,
+        cast(dr.date as date) as date,
         ac.platform,
         COALESCE(agg.cost, 0) AS cost,
         COALESCE(agg.impressions, 0) AS impressions,
@@ -277,18 +268,15 @@ cross_joined_data AS (
         COALESCE(agg.ga4_sessions, 0) AS ga4_sessions
     FROM date_range dr
     CROSS JOIN (
-        SELECT DISTINCT account, account_id, platform 
+        SELECT DISTINCT platform 
         FROM aggregated_combined_data
     ) ac
     LEFT JOIN aggregated_combined_data agg
-    ON dr.date = agg.date
-    AND ac.account = agg.account
-    AND ac.account_id = agg.account_id
+    ON cast(dr.date as date) = agg.date
     AND ac.platform = agg.platform
 )
 SELECT
     cd1.date,
-    cd1.account,
     cd1.platform,
     cd1.cost,
     cd1.impressions,
@@ -307,10 +295,8 @@ SELECT
     COALESCE(cd2.ga4_sessions, 0) AS ga4_sessions_30_days_ago
 FROM cross_joined_data cd1
 LEFT JOIN cross_joined_data cd2
-    ON cd1.account = cd2.account
-    AND cd1.account_id = cd2.account_id
-    AND cd1.platform = cd2.platform
+    ON cd1.platform = cd2.platform
     AND cd2.date = cd1.date - INTERVAL '30 DAYS'
-ORDER BY cd1.date DESC, cd1.account, cd1.platform;
+ORDER BY cd1.date DESC, cd1.platform;
 
 {% endmacro %}
