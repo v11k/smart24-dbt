@@ -1,5 +1,5 @@
 {% macro get_executive_platform_comparison_query(company_name) %}
-with ga4_sessions as (
+with ga4_traffic as (
 select
 		"Date" as "date",
 		case when "Session source / medium" like '%facebook%cpc%' then 'Facebook Ads'
