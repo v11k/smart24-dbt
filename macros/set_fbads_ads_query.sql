@@ -31,8 +31,14 @@ creative_ids as(
 		replace((creative -> 'id')::text, '"','') as creative_id 
 	from {{ source('facebook_ads', 'ads') }}
 ),
-fb_pages as 
-(
+videos as (
+SELECT DISTINCT
+    id,
+    jsonb_array_elements(format)->>'picture' AS picture_url
+FROM 
+    {{ source('facebook_ads', 'videos') }}
+),
+fb_pages as (
 select distinct page_id, name from
 {{ ref("fbpages_page_gender_" ~ company_name)}}
 )
@@ -52,7 +58,7 @@ select
 	ai.objective as "Campaign objective",
 	concat('https://www.facebook.com/adsmanager/manage/adsets?act=', ai.account_id, '&selected_campaign_ids=', ai.campaign_id) as "Campaign edit link",
 	concat('https://www.facebook.com/adsmanager/manage/ads?act=', ai.account_id, '&selected_campaign_ids=', ai.campaign_id, '&selected_adset_ids=', ai.adset_id) as "Ad set edit link",
-	coalesce(cre.image_url, cre.thumbnail_url) as "Ad creative image URL",
+	coalesce(cre.image_url, v.picture_url, cre.thumbnail_url) as "Ad creative image URL",
 	c.configured_status as "Campaign configured status",
 	creid.status as "Ad status",
 	cre.name as "Creative name",
@@ -98,6 +104,8 @@ left join creative_ids as creid
 	on creid.ad_id = ai.ad_id
 left join {{ source('facebook_ads', 'ad_creatives') }} cre
 	on cre.id = creid.creative_id
+left join videos v
+	on v.id = cre.video_id
 left join {{ ref("fbads_accounts_with_attribute")}} acc
 	on acc.account_id::text = ai.account_id::text
 left join fb_pages fbp
