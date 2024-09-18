@@ -30,11 +30,18 @@ creative_ids as(
 		status,
 		replace((creative -> 'id')::text, '"','') as creative_id 
 	from {{ source('facebook_ads', 'ads') }}
+),
+fb_pages as 
+(
+select distinct page_id, name from
+{{ ref("fbpages_page_gender_" ~ company_name)}}
 )
 select 
 	ai.date_start as "Date",
 	ai.account_name as "Account",
 	ai.account_id as "Account ID",
+	cre.actor_id as "Actor ID",
+	fbp.name as "Actor name",
 	ai.campaign_id as "Campaign ID",
 	ai.campaign_name as "Campaign name",
 	ai.adset_name as "Ad set name",
@@ -93,6 +100,8 @@ left join {{ source('facebook_ads', 'ad_creatives') }} cre
 	on cre.id = creid.creative_id
 left join {{ ref("fbads_accounts_with_attribute")}} acc
 	on acc.account_id::text = ai.account_id::text
+left join fb_pages fbp
+	on fbp.page_id = cre.actor_id
 where acc.attribute like '{{ company_name }}'
     and ai.impressions is not null
 	and ai.impressions > 0
