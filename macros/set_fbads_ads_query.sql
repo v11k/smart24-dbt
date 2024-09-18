@@ -68,7 +68,7 @@ select
 	coalesce(ex.purchases,0) as "Purchases",
 	coalesce(ex.leads,0) as "Leads",
 	coalesce(ex.messages,0) as "New messaging conversations",
-	coalesce(exav.purchase_value) as "Purchase value",
+	coalesce(exav.purchase_value,0) as "Purchase value",
 	CASE
             WHEN ai.objective::text ~~ '%CONVERSION%'::text THEN 'Konverziók'::character varying
             WHEN ai.objective::text ~~ '%ENGAGEMENT%'::text THEN 'Post interakció'::character varying
