@@ -12,7 +12,8 @@ SELECT
     (c.report_summary->>'unique_opens')::numeric as "Unique opens",
     r.unsubscribed as "Unsubscribes",
     (r.forwards->>'forwards_count')::numeric as "Forwards",
-    (r.clicks->>'unique_clicks')::numeric as "Unique clicks",
+    case when c.type = 'variate' then (r.clicks->>'clicks_total')::numeric
+        else (r.clicks->>'unique_clicks')::numeric end as "Unique clicks",
     (r.bounces->>'hard_bounces')::numeric + (r.bounces->>'soft_bounces')::numeric as "Bounces"
 FROM {{ schema_name }}.campaigns c
 LEFT JOIN {{ schema_name }}.reports r ON r.id = c.id
