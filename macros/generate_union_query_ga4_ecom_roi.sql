@@ -1,4 +1,4 @@
-{% macro generate_ga4_union_ecom_items(company_name) %}
+{% macro generate_ga4_union_ecom_roi(company_name) %}
 {% set property_ids = get_property_ids_for_company(company_name) %}
     {% do log('Property IDs for ' ~ company_name ~ ': ' ~ (property_ids | join(', ')), info=True) %}
 
