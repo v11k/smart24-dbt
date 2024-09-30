@@ -20,11 +20,12 @@ ga4_purchase as (
 	SELECT
 		"Date" as date,
 		"Event campaign name" as utm_campaign,
+        "Source / medium" as source_medium,
 		sum("Conversions") as purchases,
 		sum("Event value") as purchase_value
 	FROM {{ ref("ga4_conversions_" ~ company_name)}}
 	WHERE "Event name" = 'purchase'
-	GROUP BY 1,2
+	GROUP BY 1,2,3
 )
 SELECT
 	coalesce(ga4.date, gads.date, fbads.date) as date,
