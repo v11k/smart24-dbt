@@ -29,6 +29,7 @@ ga4_purchase as (
 )
 SELECT
 	coalesce(ga4.date, gads.date, fbads.date) as date,
+	ga4.source_medium,
 	coalesce(ga4.utm_campaign, gads.utm_campaign, fbads.utm_campaign) as campaign,
 	coalesce(fbads.cost,0) as fbads_cost,
 	coalesce(gads.cost,0) as gads_cost,
