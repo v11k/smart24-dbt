@@ -35,8 +35,8 @@ SELECT
 	coalesce(gads.cost,0) as gads_cost,
 	coalesce(ga4.purchases,0) as purchases,
 	coalesce(ga4.purchase_value,0) as purchase_value,
-	case when ga4.utm_campaign like '%google%cpc%' then ga4.purchase_value else 0 end as google_purchase_value,
-	case when ga4.utm_campaign like '%facebook%cpc%' then ga4.purchase_value else 0 end as facebok_purchase_value
+	case when ga4.source_medium like '%google%cpc%' then ga4.purchase_value else 0 end as google_purchase_value,
+	case when ga4.source_medium like '%facebook%cpc%' then ga4.purchase_value else 0 end as facebok_purchase_value
 FROM ga4_purchase ga4
 full outer join fbads on fbads.date = ga4.date
 	and fbads.utm_campaign = ga4.utm_campaign
